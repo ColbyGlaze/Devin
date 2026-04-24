@@ -2,7 +2,6 @@ services:
   - type: web
     name: devins-food-reviews
     runtime: node
-    rootDir: world_pin_map
     buildCommand: npm install
     startCommand: node server.js
     envVars:
