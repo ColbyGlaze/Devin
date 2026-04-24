@@ -46,7 +46,7 @@
         <div class="control-panel-header">
           <div>
             <p class="eyebrow">New Spot</p>
-            <h2>Add Review</h2>
+            <h2 id="formTitle">Add Review</h2>
           </div>
           <button id="menuClose" class="panel-close" type="button" aria-label="Close review form">Close</button>
         </div>
@@ -68,10 +68,11 @@
         <label for="placeDescription">Description</label>
         <textarea id="placeDescription" rows="4" maxlength="240" placeholder="What makes this place worth the stop?"></textarea>
 
-        <p class="note">Every pin uses Devin's default photo. Pin creation is locked unless admin mode is unlocked.</p>
+        <p class="note">Every pin uses Devin's default photo. Adding and editing are locked unless Devin unlocks admin mode.</p>
 
         <div class="button-row">
           <button id="armPinButton" type="button">Click Map To Drop Pin</button>
+          <button id="cancelEditButton" class="secondary-action" type="button" hidden>Cancel Edit</button>
         </div>
         <p id="placementStatus" class="status-text">Fill out the fields, then press the button and click on the map.</p>
       </section>

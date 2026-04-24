@@ -40,7 +40,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (url.pathname.startsWith("/api/pins/")) {
-      return handlePinDeletion(req, res, url.pathname.split("/").pop());
+      return handlePinById(req, res, url.pathname.split("/").pop());
     }
 
     return serveStatic(req, res, url.pathname);
@@ -125,18 +125,37 @@ function handlePins(req, res) {
   return json(res, 405, { error: "Method not allowed" });
 }
 
-function handlePinDeletion(req, res, pinId) {
-  if (req.method !== "DELETE") {
-    return json(res, 405, { error: "Method not allowed" });
-  }
-
+function handlePinById(req, res, pinId) {
   if (!isAuthenticated(req)) {
     return json(res, 401, { error: "Unauthorized" });
   }
 
-  const pins = readPins().filter((pin) => pin.id !== pinId);
-  writePins(pins);
-  return json(res, 200, { ok: true, pins });
+  if (req.method === "PUT") {
+    return readJsonBody(req, (body) => {
+      const pins = readPins();
+      const pinIndex = pins.findIndex((pin) => pin.id === pinId);
+      if (pinIndex === -1) {
+        return json(res, 404, { error: "Pin not found" });
+      }
+
+      const updatedPin = normalizePin(body, { existingPin: pins[pinIndex] });
+      if (!updatedPin) {
+        return json(res, 400, { error: "Invalid pin payload" });
+      }
+
+      pins[pinIndex] = updatedPin;
+      writePins(pins);
+      return json(res, 200, { pin: updatedPin, pins });
+    });
+  }
+
+  if (req.method === "DELETE") {
+    const pins = readPins().filter((pin) => pin.id !== pinId);
+    writePins(pins);
+    return json(res, 200, { ok: true, pins });
+  }
+
+  return json(res, 405, { error: "Method not allowed" });
 }
 
 function serveStatic(req, res, requestPath) {
@@ -163,25 +182,27 @@ function serveStatic(req, res, requestPath) {
   });
 }
 
-function normalizePin(body) {
+function normalizePin(body, options = {}) {
   const name = String(body.name || "").trim();
   const description = String(body.description || "").trim();
   const rating = Number(body.rating);
   const lat = Number(body.lat);
   const lng = Number(body.lng);
+  const existingPin = options.existingPin || null;
 
   if (!name || !description) return null;
   if (!Number.isFinite(rating) || rating < 1 || rating > 10) return null;
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
   return {
-    id: crypto.randomUUID(),
+    id: existingPin?.id || crypto.randomUUID(),
     name,
     description,
     rating,
     lat: Math.round(lat * 10000) / 10000,
     lng: Math.round(lng * 10000) / 10000,
-    createdAt: new Date().toISOString(),
+    createdAt: existingPin?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -193,7 +214,7 @@ function readJsonBody(req, callback) {
       const raw = Buffer.concat(chunks).toString("utf8") || "{}";
       callback(JSON.parse(raw));
     } catch (error) {
-      json(req, 400, { error: "Invalid JSON" });
+      json(req.res || req, 400, { error: "Invalid JSON" });
     }
   });
 }

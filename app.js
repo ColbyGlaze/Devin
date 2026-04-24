@@ -12,6 +12,7 @@ const state = {
   isAdmin: false,
   placementArmed: false,
   activePinId: null,
+  editingPinId: null,
   panelOpen: false,
 };
 
@@ -30,7 +31,9 @@ const els = {
   menuToggle: document.getElementById("menuToggle"),
   menuClose: document.getElementById("menuClose"),
   controlPanel: document.getElementById("controlPanel"),
+  formTitle: document.getElementById("formTitle"),
   armPinButton: document.getElementById("armPinButton"),
+  cancelEditButton: document.getElementById("cancelEditButton"),
   placementStatus: document.getElementById("placementStatus"),
   pinCount: document.getElementById("pinCount"),
   modeBadge: document.getElementById("modeBadge"),
@@ -64,6 +67,10 @@ function bindEvents() {
     setPanelOpen(false);
   });
 
+  els.cancelEditButton.addEventListener("click", () => {
+    exitEditMode("Edit canceled.");
+  });
+
   els.authButton.addEventListener("click", async () => {
     await login();
   });
@@ -84,6 +91,11 @@ function bindEvents() {
 
     if (!state.isAdmin) {
       els.placementStatus.textContent = "Unlock admin mode to add or edit pins.";
+      return;
+    }
+
+    if (state.editingPinId) {
+      void savePinEdit();
       return;
     }
 
@@ -203,6 +215,7 @@ async function logout() {
 
   state.isAdmin = false;
   state.placementArmed = false;
+  state.editingPinId = null;
   updateAdminUi();
   updatePlacementUi("Admin mode locked.");
 }
@@ -262,6 +275,64 @@ async function handleMapPlacement(event) {
   }
 }
 
+async function savePinEdit() {
+  if (!state.editingPinId || !state.isAdmin) return;
+
+  const validation = validateForm();
+  if (!validation.valid) {
+    updatePlacementUi(validation.message);
+    return;
+  }
+
+  const existingPin = state.pins.find((pin) => pin.id === state.editingPinId);
+  if (!existingPin) {
+    exitEditMode("That pin could not be found.");
+    return;
+  }
+
+  const updatedDraft = {
+    name: els.placeName.value.trim(),
+    rating: Number(els.placeRating.value),
+    description: els.placeDescription.value.trim(),
+    lat: existingPin.lat,
+    lng: existingPin.lng,
+  };
+
+  try {
+    const response = await fetch(`/api/pins/${encodeURIComponent(state.editingPinId)}`, {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedDraft),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        state.isAdmin = false;
+        state.editingPinId = null;
+        updateAdminUi();
+        updatePlacementUi("Admin session expired. Unlock again to edit pins.");
+        return;
+      }
+      updatePlacementUi("Could not save those pin changes.");
+      return;
+    }
+
+    const payload = await response.json();
+    state.pins = Array.isArray(payload.pins) ? payload.pins : state.pins;
+    state.activePinId = payload.pin?.id ?? state.activePinId;
+    renderPins();
+    exitEditMode(`Pin updated for ${updatedDraft.name}.`, { preserveForm: false, keepPanelOpen: false });
+    if (state.activePinId) {
+      focusPin(state.activePinId, { zoom: Math.max(map.getZoom(), 5), openPopup: true });
+    }
+  } catch (error) {
+    updatePlacementUi("Could not reach the server.");
+  }
+}
+
 function renderPins() {
   els.pinCount.textContent = String(state.pins.length);
 
@@ -289,6 +360,9 @@ function renderPins() {
     });
     marker.on("click", () => {
       focusPin(pin.id, { zoom: Math.max(map.getZoom(), 5), openPopup: false });
+      if (state.isAdmin) {
+        enterEditMode(pin.id);
+      }
     });
     marker.on("popupopen", () => {
       focusPin(pin.id, { zoom: Math.max(map.getZoom(), 5), openPopup: false });
@@ -349,6 +423,33 @@ function clearForm() {
   els.placeDescription.value = "";
 }
 
+function enterEditMode(pinId) {
+  const pin = state.pins.find((entry) => entry.id === pinId);
+  if (!pin || !state.isAdmin) return;
+
+  state.editingPinId = pinId;
+  state.placementArmed = false;
+  els.placeName.value = pin.name;
+  els.placeRating.value = String(pin.rating);
+  els.placeDescription.value = pin.description;
+  setPanelOpen(true);
+  updatePlacementUi(`Editing ${pin.name}. Save changes when ready.`);
+}
+
+function exitEditMode(message, options = {}) {
+  const preserveForm = options.preserveForm ?? false;
+  const keepPanelOpen = options.keepPanelOpen ?? true;
+
+  state.editingPinId = null;
+  if (!preserveForm) {
+    clearForm();
+  }
+  if (!keepPanelOpen) {
+    setPanelOpen(false);
+  }
+  updatePlacementUi(message);
+}
+
 function focusPin(pinId, options = {}) {
   if (state.isFileProtocol || !markerRegistry.has(pinId)) return;
   state.activePinId = pinId;
@@ -375,10 +476,16 @@ function applyActiveMarkerState() {
 }
 
 function updatePlacementUi(message) {
-  els.modeBadge.textContent = state.placementArmed ? "Armed" : "Idle";
-  els.armPinButton.textContent = state.placementArmed ? "Cancel Pin Drop" : "Click Map To Drop Pin";
+  const isEditing = Boolean(state.editingPinId);
+  els.modeBadge.textContent = isEditing ? "Editing" : (state.placementArmed ? "Armed" : "Idle");
+  els.formTitle.textContent = isEditing ? "Edit Review" : "Add Review";
+  els.armPinButton.textContent = isEditing
+    ? "Save Pin Changes"
+    : (state.placementArmed ? "Cancel Pin Drop" : "Click Map To Drop Pin");
   els.armPinButton.disabled = !state.isAdmin;
+  els.cancelEditButton.hidden = !isEditing;
   document.body.classList.toggle("is-placing-pin", state.placementArmed);
+  document.body.classList.toggle("is-editing-pin", isEditing);
   if (message) {
     els.placementStatus.textContent = message;
   }
@@ -390,12 +497,10 @@ function updateAdminUi() {
   els.adminPassword.disabled = state.isAdmin;
   els.adminPassword.placeholder = state.isAdmin ? "Admin unlocked" : "Enter admin password";
 
-  if (state.isAdmin && !els.adminStatus.textContent) {
-    els.adminStatus.textContent = "Admin unlocked.";
-  }
-
-  if (!state.isAdmin && !els.adminStatus.textContent) {
-    els.adminStatus.textContent = "Public visitors can view pins, but only admins can add them.";
+  if (state.isAdmin) {
+    els.adminStatus.textContent = "Admin unlocked. Click a pin to edit it, or add a new one.";
+  } else {
+    els.adminStatus.textContent = "Public visitors can view pins, but only admins can add or edit them.";
   }
 
   updatePlacementUi();
