@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devin's Food Reviews</title>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="map-stage">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
+      <div class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">Food Map</p>
+          <h1>Devin's Food Reviews</h1>
+          <p class="muted">Pan and zoom the real map, then click a pin to see the location, rating, and description.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <span class="small-label">Placement Mode</span>
+            <strong id="modeBadge">Idle</strong>
+          </div>
+          <div class="stat-card">
+            <span class="small-label">Saved Pins</span>
+            <strong id="pinCount">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <button id="menuToggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="controlPanel">Add Review</button>
+
+      <section id="controlPanel" class="control-panel is-collapsed">
+        <div class="control-panel-header">
+          <div>
+            <p class="eyebrow">New Spot</p>
+            <h2>Add Review</h2>
+          </div>
+          <button id="menuClose" class="panel-close" type="button" aria-label="Close review form">Close</button>
+        </div>
+        <div class="auth-panel">
+          <label for="adminPassword">Admin Password</label>
+          <input id="adminPassword" type="password" placeholder="Enter admin password" autocomplete="current-password">
+          <div class="auth-actions">
+            <button id="authButton" type="button">Unlock</button>
+            <button id="logoutButton" class="secondary-action" type="button" hidden>Lock</button>
+          </div>
+          <p id="adminStatus" class="status-text">Public visitors can view pins, but only admins can add them.</p>
+        </div>
+        <label for="placeName">Place Name</label>
+        <input id="placeName" type="text" maxlength="60" placeholder="Restaurant name">
+
+        <label for="placeRating">Rating (1-10)</label>
+        <input id="placeRating" type="number" min="1" max="10" step="1" value="8">
+
+        <label for="placeDescription">Description</label>
+        <textarea id="placeDescription" rows="4" maxlength="240" placeholder="What makes this place worth the stop?"></textarea>
+
+        <p class="note">Every pin uses Devin's default photo. Pin creation is locked unless admin mode is unlocked.</p>
+
+        <div class="button-row">
+          <button id="armPinButton" type="button">Click Map To Drop Pin</button>
+        </div>
+        <p id="placementStatus" class="status-text">Fill out the fields, then press the button and click on the map.</p>
+      </section>
+
+      <section class="map-card">
+        <div id="protocolNotice" class="protocol-notice is-hidden">
+          <h2>Open This Map From A Web Address</h2>
+          <p>Tile servers block local <code>file://</code> pages, which causes the 403 map errors.</p>
+          <p>Use <code>http://127.0.0.1:8000/world_pin_map/index.html</code> or publish this folder to a normal website so people can open it over <code>http</code> or <code>https</code>.</p>
+        </div>
+        <div id="map" class="map-host" aria-label="World map"></div>
+      </section>
+    </section>
+  </main>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="./app.js"></script>
+</body>
+</html>

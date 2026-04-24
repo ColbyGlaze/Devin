@@ -1,0 +1,650 @@
+:root {
+  --bg: #efe4d2;
+  --surface: rgba(255, 248, 240, 0.74);
+  --surface-strong: rgba(255, 252, 247, 0.92);
+  --line: rgba(141, 106, 85, 0.18);
+  --line-strong: rgba(108, 73, 55, 0.24);
+  --ink: #1d2328;
+  --muted: #6f6d70;
+  --accent: #ca5b3e;
+  --accent-deep: #8d3422;
+  --accent-soft: rgba(248, 195, 168, 0.5);
+  --good: #1e6b5d;
+  --shadow: 0 26px 70px rgba(39, 29, 24, 0.16);
+  --shadow-soft: 0 12px 30px rgba(39, 29, 24, 0.08);
+  --sans: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --display: "Space Grotesk", "Avenir Next", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--ink);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(202, 91, 62, 0.2), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(34, 116, 131, 0.16), transparent 28%),
+    linear-gradient(180deg, #f8f0e5 0%, #e9dbc8 100%);
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.eyebrow,
+.small-label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--display);
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.muted,
+.note,
+.status-text {
+  color: var(--muted);
+}
+
+.control-panel,
+.map-card,
+.stat-card,
+.topbar,
+.menu-toggle {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.control-panel,
+.map-card,
+.topbar,
+.menu-toggle {
+  border-radius: 24px;
+}
+
+.map-stage {
+  position: relative;
+  min-height: 100vh;
+  padding: 18px;
+  isolation: isolate;
+}
+
+.topbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 124px;
+  z-index: 700;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  backdrop-filter: blur(22px) saturate(135%);
+  background:
+    linear-gradient(135deg, rgba(255, 252, 247, 0.74) 0%, rgba(255, 244, 233, 0.6) 100%);
+  animation: floatIn 600ms ease both;
+}
+
+.menu-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 710;
+  border: 0;
+  min-width: 98px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: rgba(255, 250, 244, 0.92);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
+}
+
+label {
+  display: block;
+  margin: 10px 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(125, 92, 73, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.88);
+  padding: 11px 13px;
+  font: inherit;
+  color: inherit;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(202, 91, 62, 0.42);
+  box-shadow: 0 0 0 5px rgba(202, 91, 62, 0.12);
+  background: rgba(255, 253, 249, 0.96);
+  transform: translateY(-1px);
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.auth-panel {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(125, 92, 73, 0.12);
+}
+
+.auth-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 18px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.26), transparent 34%),
+    linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  box-shadow: 0 18px 32px rgba(127, 46, 29, 0.24);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+
+button:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 22px 36px rgba(127, 46, 29, 0.28);
+  filter: saturate(1.05);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.secondary-action {
+  background: rgba(255, 252, 247, 0.88);
+  color: var(--ink);
+  box-shadow: none;
+  border: 1px solid rgba(125, 92, 73, 0.14);
+}
+
+.status-text {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.brand-block {
+  max-width: 560px;
+}
+
+.brand-block .muted {
+  max-width: 480px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.stat-card {
+  min-width: 98px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(249, 239, 228, 0.72) 100%);
+  box-shadow: var(--shadow-soft);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(39, 29, 24, 0.14);
+}
+
+.stat-card strong {
+  font-size: 0.98rem;
+  font-family: var(--display);
+}
+
+.control-panel {
+  position: absolute;
+  top: 72px;
+  right: 16px;
+  z-index: 700;
+  width: min(258px, calc(100vw - 32px));
+  max-height: min(58vh, 390px);
+  overflow: auto;
+  padding: 11px;
+  backdrop-filter: blur(24px) saturate(135%);
+  background:
+    linear-gradient(180deg, rgba(255, 249, 242, 0.78) 0%, rgba(255, 244, 234, 0.62) 100%);
+  animation: floatIn 720ms 80ms ease both;
+  display: block;
+}
+
+.control-panel.is-collapsed {
+  display: none;
+}
+
+.control-panel-header {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel-close {
+  padding: 5px 9px;
+  font-size: 0.9rem;
+  background: rgba(255, 252, 247, 0.84);
+  color: var(--ink);
+  box-shadow: none;
+  border: 1px solid rgba(125, 92, 73, 0.12);
+}
+
+.control-panel .note {
+  margin-top: 10px;
+  padding: 7px 9px;
+  border-radius: 12px;
+  background: rgba(255, 252, 247, 0.7);
+  border: 1px solid rgba(125, 92, 73, 0.12);
+  font-size: 0.72rem;
+}
+
+#armPinButton:disabled,
+#authButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 12px 22px rgba(127, 46, 29, 0.12);
+}
+
+.map-card {
+  padding: 12px;
+  min-height: calc(100vh - 36px);
+  background:
+    linear-gradient(180deg, rgba(255, 249, 241, 0.38) 0%, rgba(255, 244, 233, 0.2) 100%);
+  animation: fadeInMap 900ms ease both;
+  position: relative;
+}
+
+.map-host {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.protocol-notice {
+  position: absolute;
+  inset: 20px;
+  z-index: 800;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 251, 246, 0.94);
+  border: 1px solid rgba(125, 92, 73, 0.16);
+  box-shadow: 0 24px 48px rgba(30, 28, 28, 0.14);
+  max-width: 520px;
+}
+
+.protocol-notice code {
+  font-family: "SFMono-Regular", "Menlo", monospace;
+  font-size: 0.92em;
+  background: rgba(125, 92, 73, 0.08);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.protocol-notice.is-hidden {
+  display: none;
+}
+
+h2 {
+  margin-bottom: 6px;
+  font-size: 1.2rem;
+}
+
+body.is-placing-pin .map-host,
+body.is-placing-pin .leaflet-container {
+  cursor: crosshair;
+}
+
+body.is-placing-pin .control-panel {
+  box-shadow: 0 32px 80px rgba(202, 91, 62, 0.18);
+}
+
+.leaflet-container {
+  font: inherit;
+}
+
+.leaflet-control-zoom {
+  border: 0;
+  box-shadow: 0 16px 30px rgba(19, 36, 47, 0.2);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  border: 0;
+  color: var(--accent-deep);
+  background: rgba(255, 251, 246, 0.92);
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(255, 245, 236, 0.98);
+  color: var(--accent);
+}
+
+.leaflet-bottom.leaflet-right {
+  bottom: 26px;
+  right: 26px;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 251, 246, 0.86);
+  border-radius: 10px;
+  margin: 0 0 12px 12px;
+  padding: 2px 6px;
+}
+
+.custom-pin {
+  width: 54px;
+  height: 74px;
+  pointer-events: auto;
+  background: transparent;
+  border: 0;
+}
+
+.pin-badge {
+  position: relative;
+  width: 54px;
+  height: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 12px 14px rgba(22, 24, 25, 0.22));
+  transform-origin: center bottom;
+  transition: transform 220ms ease, filter 220ms ease;
+  animation: pinRise 360ms ease both;
+}
+
+.custom-pin.is-focused .pin-badge,
+.pin-badge.is-active {
+  transform: scale(1.16) translateY(-2px);
+  filter: drop-shadow(0 18px 24px rgba(187, 79, 53, 0.34));
+}
+
+.pin-avatar {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  object-position: center 18%;
+  border-radius: 999px;
+  border: 3px solid #fff8f1;
+  box-shadow: 0 0 0 3px var(--accent);
+  background: #e9dfd1;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.custom-pin:hover .pin-avatar {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 3px var(--accent), 0 16px 26px rgba(141, 52, 34, 0.2);
+}
+
+.pin-stem {
+  position: relative;
+  width: 6px;
+  height: 24px;
+  margin-top: -1px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-deep) 100%);
+}
+
+.pin-stem::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-deep);
+  border-radius: 2px 2px 12px 12px;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.popup-card {
+  min-width: 248px;
+  max-width: 280px;
+  padding: 2px;
+  color: var(--ink);
+}
+
+.popup-card img {
+  width: 100%;
+  height: 156px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 16px;
+  margin-bottom: 12px;
+}
+
+.popup-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+}
+
+.popup-card p {
+  margin: 6px 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 24px;
+  background: rgba(255, 251, 246, 0.96);
+  box-shadow: 0 24px 48px rgba(30, 28, 28, 0.18);
+  padding: 10px;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+}
+
+.leaflet-popup-tip {
+  background: rgba(255, 251, 246, 0.96);
+}
+
+.ambient {
+  position: absolute;
+  z-index: 0;
+  border-radius: 999px;
+  filter: blur(40px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.ambient-one {
+  top: 60px;
+  right: 140px;
+  width: 260px;
+  height: 260px;
+  background: rgba(228, 123, 91, 0.18);
+}
+
+.ambient-two {
+  bottom: 80px;
+  left: 120px;
+  width: 320px;
+  height: 320px;
+  background: rgba(69, 143, 156, 0.16);
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInMap {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pinRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 980px) {
+  body {
+    overflow: auto;
+  }
+
+  .topbar {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  .menu-toggle {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-top: 12px;
+  }
+
+  .control-panel {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    margin: 12px 0;
+  }
+
+  .hero-stats {
+    flex-wrap: wrap;
+  }
+
+  .map-host {
+    min-height: 72vh;
+  }
+
+  .ambient {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .map-stage {
+    padding: 14px;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+  .hero-stats {
+    width: 100%;
+  }
+
+  .topbar,
+  .control-panel {
+    padding: 16px;
+  }
+
+  .map-card {
+    min-height: calc(100vh - 28px);
+  }
+
+  .leaflet-bottom.leaflet-right {
+    bottom: 18px;
+    right: 18px;
+  }
+}

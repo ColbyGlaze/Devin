@@ -1,0 +1,9 @@
+{
+  "name": "devins-food-reviews",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Protected food review map for GitHub + Render deployment.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
